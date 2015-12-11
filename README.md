@@ -10,3 +10,6 @@ Usage
     git clone https://github.com/diogopereira/SpeedTestCollector.git
     cd SpeedTestCollector
     ./startspeedtest.sh
+
+The file output will be as it follows:
+[HOUR:MINUTE];[DOWNLOAD];[UPLOAD]
