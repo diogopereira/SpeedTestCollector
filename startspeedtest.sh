@@ -37,7 +37,7 @@ done
 file="$directory/result_$now.csv"
 echo "Sending result to \"$file\""
 
-tempOutput="output.txt"
+tempOutput="/var/www/speedtestresults/output.txt"
 #Checking if using $output
 if ! [ -z "$output"]
 	then
@@ -46,7 +46,9 @@ if ! [ -z "$output"]
 fi
 
 #Execute script to test speed
+echo "Starting to execute the speed test..."
 ./speedtest-cli-modified > "$(echo $tempOutput)"
+echo "Output saved at $tempOutput... retrieving values..."
 #Retrive data from test
 download="$(sed '7q;d' $tempOutput)"
 upload="$(sed '9q;d' $tempOutput)"
@@ -62,10 +64,15 @@ if [ -z "$upload" ]
 fi
 upload="$(echo $upload | sed -r 's/\.+/,/g')"
 
+echo "Download speed at $download"
+echo "Upload speed at $upload"
+echo "Saving data..."
 echo "$hour;$download;$upload" >> "$file"
 
 #If no output was set, remove file, otherwise, keep it
 if [ -z "$output"]
         then
+	echo "Removing temporary files..."
 	rm "$(echo $tempOutput)"
 fi
+echo "Done."
