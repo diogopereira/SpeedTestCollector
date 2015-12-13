@@ -7,6 +7,7 @@ function usage
 	echo "-h		--help				Show this message"
 	echo "-d <directory>	--directory <directory>		Destination file to where the result should be written. By default is in \"/var/www/speedtestresults\""
 	echo "-o <filename>	--testoutput <filename>		If this option is used, the last output from the speedtest script will be kept in the designed location"
+	echo "-s <script>	--script <script>		Speed test script. If this option is not used, by default, it will be used /root/SpeedTestCollector/speedtest-cli-modified"
 }
 
 #Starting script at time $hour...
@@ -15,6 +16,7 @@ now=$(date +"%m_%d_%Y")
 
 directory="/var/www/speedtestresults"
 output=""
+script="/root/SpeedTestCollector/speedtest-cli-modified"
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -23,6 +25,9 @@ while [ "$1" != "" ]; do
                                 ;;
 	-o | --testoutput )	shift
 				output="$1"
+				;;
+	-s | --script )		shift
+				script="$1"
 				;;
         -h | --help )           usage
                                 exit
@@ -39,15 +44,15 @@ echo "Sending result to \"$file\""
 
 tempOutput="/var/www/speedtestresults/output.txt"
 #Checking if using $output
-if ! [ -z "$output"]
+if ! [ -z "$output" ]
 	then
 	echo "Using output \"$output\"."
-	tempOutput = output
+	tempOutput="$output"
 fi
 
 #Execute script to test speed
 echo "Starting to execute the speed test..."
-./speedtest-cli-modified > "$(echo $tempOutput)"
+"$(echo $script)" > "$(echo $tempOutput)"
 echo "Output saved at $tempOutput... retrieving values..."
 #Retrive data from test
 download="$(sed '7q;d' $tempOutput)"
@@ -70,7 +75,7 @@ echo "Saving data..."
 echo "$hour;$download;$upload" >> "$file"
 
 #If no output was set, remove file, otherwise, keep it
-if [ -z "$output"]
+if [ -z "$output" ]
         then
 	echo "Removing temporary files..."
 	rm "$(echo $tempOutput)"
